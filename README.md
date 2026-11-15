@@ -5,7 +5,7 @@ Britain Today, Chapter I (basılı s. 5–24) için interaktif çalışma harita
 Yerler, şematik yükselti, flora ve fauna katmanları. Açıklamalar Türkçe;
 öğrenilecek adlar İngilizce. Kitap dışı açıklamalar ★ ile ayrılır.
 
-Yerler katmanında 107 konu korunur; önemli yerler genel görünümde,
+Yerler katmanında 110 konu korunur; önemli yerler genel görünümde,
 diğer adlar yakınlaştırdıkça açılır. Kitaptaki kalın adlar sarı vurgulu,
 diğer adlar ince görünür. 23 nehir grubu çizgiden, sekiz göl alanından seçilir.
 
