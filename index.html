@@ -283,10 +283,34 @@ function buildMap(){
  go:p=>{const{w,h}=viewport(),factor=2**Math.max(0,8-level);scale*=factor;level=Math.max(level,8);const a=raw(p.lon,p.lat);tx=(w>700?w*.36:w*.5)-a[0]*scale;ty=(w>700?h*.45:h*.28)-a[1]*scale;draw();},
  reveal:p=>{const{w,h}=viewport(),a=pt(p);if(w<=700&&a.y>h*.42){ty+=h*.27-a.y;draw();}else if(w>700&&a.x>w-440){tx+=w*.42-a.x;draw();}},
  fit:(ps,z)=>{const{w,h}=viewport(),center={lon:ps.reduce((s,p)=>s+p.lon,0)/ps.length,lat:ps.reduce((s,p)=>s+p.lat,0)/ps.length},a=raw(center.lon,center.lat);scale*=2**(z-level);level=z;tx=w/2-a[0]*scale;ty=h*.45-a[1]*scale;draw();},
- destroy:()=>{handlers.forEach(([el,t,fn])=>el.removeEventListener(t,fn));container.replaceChildren();}};
- function on(el,t,fn,opts){el.addEventListener(t,fn,opts);handlers.push([el,t,fn]);}
- on(svg,'wheel',ev=>{ev.preventDefault();const factor=ev.deltaY>0?1/1.18:1.18;if(level+Math.log2(factor)<3||level+Math.log2(factor)>13)return;const r=svg.getBoundingClientRect();zoomAt(factor,ev.clientX-r.left,ev.clientY-r.top);},{passive:false});
- const pointers=new Map();let pinch=null;
+ destroy:()=>{handlers.forEach(([el,t,fn,opts])=>el.removeEventListener(t,fn,opts));container.replaceChildren();}};
+ function on(el,t,fn,opts){el.addEventListener(t,fn,opts);handlers.push([el,t,fn,opts]);}
+ const pointers=new Map();let pinch=null,safariGesture=null,lastMouse=null;
+ on(svg,'wheel',ev=>{ev.preventDefault();if(safariGesture)return;const factor=ev.deltaY>0?1/1.18:1.18;if(level+Math.log2(factor)<3||level+Math.log2(factor)>13)return;const r=svg.getBoundingClientRect();zoomAt(factor,ev.clientX-r.left,ev.clientY-r.top);},{passive:false});
+ // Safari trackpads emit GestureEvents rather than the ctrl+wheel sequence
+ // used by Chromium. Handle only the map, including its HTML marker overlay.
+ on(container,'pointermove',ev=>{if(ev.pointerType==='mouse'&&Number.isFinite(ev.clientX)&&Number.isFinite(ev.clientY))lastMouse={x:ev.clientX,y:ev.clientY};});
+ function gestureAnchor(ev){
+  const r=container.getBoundingClientRect(),{w,h}=viewport();
+  const located=Number.isFinite(ev.clientX)&&Number.isFinite(ev.clientY);
+  const point=located?{x:ev.clientX,y:ev.clientY}:lastMouse;
+  return point?{x:Math.max(0,Math.min(w,point.x-r.left)),y:Math.max(0,Math.min(h,point.y-r.top))}:{x:w/2,y:h/2};
+ }
+ const gestureOptions={passive:false,capture:true};
+ on(container,'gesturestart',ev=>{
+  ev.preventDefault();
+  safariGesture={scale:Number.isFinite(ev.scale)&&ev.scale>0?ev.scale:1,anchor:gestureAnchor(ev),touchDriven:pointers.size>=2};
+ },gestureOptions);
+ on(container,'gesturechange',ev=>{
+  ev.preventDefault();
+  if(!safariGesture||!Number.isFinite(ev.scale)||ev.scale<=0)return;
+  const factor=ev.scale/safariGesture.scale;safariGesture.scale=ev.scale;
+  // iPhone/iPad already zoom through PointerEvents; never apply both paths.
+  if(pointers.size>=2||safariGesture.touchDriven){safariGesture.touchDriven=true;return;}
+  const next=Math.max(3,Math.min(13,level+Math.log2(factor)));
+  if(next!==level)zoomAt(2**(next-level),safariGesture.anchor.x,safariGesture.anchor.y);
+ },gestureOptions);
+ on(container,'gestureend',ev=>{ev.preventDefault();safariGesture=null;},gestureOptions);
  function beginGesture(){const a=[...pointers.values()];if(a.length===2){pinch={distance:Math.hypot(a[1].x-a[0].x,a[1].y-a[0].y),x:(a[0].x+a[1].x)/2,y:(a[0].y+a[1].y)/2};drag=null;}else if(a.length===1){drag={x:a[0].x,y:a[0].y,tx,ty};pinch=null;}else{drag=null;pinch=null;}}
  on(svg,'pointerdown',ev=>{if(pointers.size===0)startCountry=ev.target.closest?.('[data-country]')?.dataset.country||null;svg.setPointerCapture(ev.pointerId);pointers.set(ev.pointerId,{x:ev.clientX,y:ev.clientY});if(pointers.size===1)dragged=false;else dragged=true;beginGesture();});
  on(svg,'pointermove',ev=>{if(!pointers.has(ev.pointerId))return;pointers.set(ev.pointerId,{x:ev.clientX,y:ev.clientY});if(pointers.size>=2&&pinch){const a=[...pointers.values()],distance=Math.hypot(a[1].x-a[0].x,a[1].y-a[0].y),x=(a[0].x+a[1].x)/2,y=(a[0].y+a[1].y)/2,r=svg.getBoundingClientRect();const factor=distance/Math.max(1,pinch.distance);if(level+Math.log2(factor)>3&&level+Math.log2(factor)<13){tx+=x-pinch.x;ty+=y-pinch.y;zoomAt(factor,x-r.left,y-r.top);}pinch={distance,x,y};dragged=true;}else if(drag){const dx=ev.clientX-drag.x,dy=ev.clientY-drag.y;if(Math.hypot(dx,dy)>4)dragged=true;tx=drag.tx+dx;ty=drag.ty+dy;draw();}});
