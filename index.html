@@ -59,6 +59,38 @@
 .key.lake-area{width:12px;height:8px;border:1px solid #6296a7;border-radius:45%;background:#a6cbd7}
 @media(pointer:coarse){.water-hit{stroke-width:22}.water-hit.lake-hit{stroke-width:15}}
 
+/* Search bar and instant index results */
+.top-actions{display:flex;align-items:center;gap:8px;z-index:1050}
+.search-wrap{position:relative;width:255px;transition:width .16s ease}
+.search-wrap.open,.search-wrap:focus-within{width:315px}
+.search-bar{display:flex;align-items:center;gap:7px;background:rgba(255,254,250,.95);border:1px solid rgba(84,113,118,.22);border-radius:12px;padding:0 11px;height:39px;box-shadow:0 4px 18px #193d480b;transition:border-color .15s,box-shadow .15s,background .15s}
+.search-wrap.open .search-bar,.search-wrap:focus-within .search-bar{background:var(--paper);border-color:#234b58;box-shadow:0 6px 24px #193d481a}
+.search-icon{width:14px;height:14px;color:var(--muted);flex:none}
+#search-input{border:0;background:transparent;font:inherit;font-size:12px;color:var(--ink);width:100%;min-width:0;padding:8px 0;outline:none}
+#search-input::placeholder{color:var(--muted)}
+#search-input::-webkit-search-cancel-button,#search-input::-webkit-search-decoration{-webkit-appearance:none;appearance:none;display:none}
+.search-kbd{font:550 10px/1 Inter,sans-serif;color:var(--muted);background:#eef2ef;border:1px solid #d5dfdc;border-radius:5px;padding:3px 5px;flex:none;pointer-events:none}
+.search-clear{border:0;background:#eaeff0;color:var(--ink);border-radius:50%;width:20px;height:20px;font-size:14px;line-height:1;display:grid;place-items:center;padding:0;flex:none}
+.search-clear:hover{background:#dce5e7}
+.search-results{position:absolute;top:calc(100% + 7px);right:0;width:355px;max-height:min(64dvh,430px);overflow-y:auto;overscroll-behavior:contain;background:var(--paper);border:1px solid #b7cccf;border-radius:15px;box-shadow:0 14px 44px #153f4d26;padding:8px;z-index:1100;animation:appear .14s ease-out}
+.search-filters{display:flex;gap:5px;flex-wrap:wrap;padding:2px 4px 7px;border-bottom:1px solid #e6ecea;margin-bottom:5px}
+.search-chip{border:1px solid #d2dedb;background:#f4f7f5;color:#35565e;border-radius:999px;padding:4px 9px;font-size:10.5px;font-weight:550;line-height:1.2}
+.search-chip:hover{background:#e7efec}
+.search-chip[aria-pressed=true]{background:#234b48;border-color:#234b48;color:#fffefa}
+.search-meta{display:flex;align-items:center;justify-content:space-between;font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);padding:3px 6px 5px}
+.search-item{display:block;width:100%;text-align:left;border:0;background:transparent;border-radius:10px;padding:8px 9px;transition:background .1s}
+.search-item+.search-item{margin-top:2px}
+.search-item:hover,.search-item.active{background:#ecf2f0}
+.search-item-head{display:flex;align-items:center;gap:7px;font-size:12.5px;line-height:1.3;color:var(--ink)}
+.search-item-title{font-weight:500;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.search-item-meta{font-size:10px;color:var(--muted);flex:none;white-space:nowrap}
+.search-item-sub{margin:3px 0 0 14px;font-size:11px;line-height:1.45;color:#4a646b;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.search-item-sub mark{background:#f3df8f;color:#273b26;padding:0 2px;border-radius:3px}
+.search-badge{display:inline-block;font-size:9.5px;font-weight:650;letter-spacing:.03em;padding:1px 5px;border-radius:4px;background:#e3ece8;color:#254b45;margin-right:5px;vertical-align:1px}
+.search-empty{padding:18px 12px;text-align:center;font-size:12px;color:var(--muted);line-height:1.5}
+@media(pointer:coarse){.search-kbd{display:none}}
+@media(max-width:700px){.top-actions{top:20px;right:16px;gap:6px}.search-wrap{width:128px}.search-bar{height:36px;padding:0 9px;border-radius:11px}#search-input{font-size:12px}.top-actions.search-active{left:16px;right:16px}.top-actions.search-active #about-open{display:none}.top-actions.search-active .search-wrap{width:100%}.search-results{left:0;right:0;width:auto;max-height:56dvh}}
+
 </style>
 
 
@@ -82,6 +114,15 @@
       <button id="layer-fauna" aria-pressed="false">Fauna</button>
     </nav>
     <div class="top-actions">
+      <div id="search-wrap" class="search-wrap" role="search" aria-label="Haritada yer ve konu ara">
+        <div class="search-bar">
+          <svg class="search-icon" viewBox="0 0 16 16" aria-hidden="true"><circle cx="6.8" cy="6.8" r="5" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M10.5 10.5L14.2 14.2" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+          <input id="search-input" type="search" autocomplete="off" spellcheck="false" placeholder="Yer, nehir, dağ, konu ara…" aria-label="Yer, nehir, dağ veya konu ara" aria-expanded="false" aria-controls="search-results" aria-autocomplete="list">
+          <kbd id="search-shortcut" class="search-kbd" aria-hidden="true">/</kbd>
+          <button id="search-clear" class="search-clear" type="button" aria-label="Aramayı temizle" hidden>×</button>
+        </div>
+        <div id="search-results" class="search-results" role="listbox" aria-label="Arama sonuçları" hidden></div>
+      </div>
       <button id="about-open" class="glass-button" aria-label="Harita bilgisi ve kaynaklar">Bilgi <span aria-hidden="true">↗</span></button>
     </div>
     <nav class="map-tools" aria-label="Harita kontrolleri">
@@ -336,7 +377,212 @@ $('zoom-in').addEventListener('click',()=>engine.step(1));$('zoom-out').addEvent
 for(const key of Object.keys(layerNames))$('layer-'+key).addEventListener('click',()=>setLayer(key));
 $('detail-close').addEventListener('click',()=>closeDetail());$('cluster-close').addEventListener('click',closeCluster);$('about-open').addEventListener('click',()=>$('about').showModal());$('about-close').addEventListener('click',()=>$('about').close());
 $('about').addEventListener('click',ev=>{if(ev.target===$('about')){const r=$('about').getBoundingClientRect();if(ev.clientX<r.left||ev.clientX>r.right||ev.clientY<r.top||ev.clientY>r.bottom)$('about').close();}});
-document.addEventListener('keydown',ev=>{if(ev.key==='Escape'){closeCluster();if(!$('detail').hidden)closeDetail();}});
+
+// Instant search across all 107 places, book-emphasized terms, pages, and thematic layers.
+const trChars={'İ':'i','I':'i','ı':'i','Ğ':'g','ğ':'g','Ü':'u','ü':'u','Ş':'s','ş':'s','Ö':'o','ö':'o','Ç':'c','ç':'c','’':"'",'‘':"'",'–':'-','—':'-'};
+const fold=s=>String(s||'').replace(/[İIıĞğÜüŞşÖöÇç’‘–—]/g,c=>trChars[c]||c).toLowerCase();
+const norm=s=>fold(s).replace(/\s+/g,' ').trim();
+const kindAliases={country:'ulke country krallik',region:'bolge region ova yayla',mountain:'dag mountain zirve tepe yukselti peak',lake:'gol lake loch lough su',river:'nehir river akarsu irmak su',island:'ada island adalar takimada',nature:'doga nature koruma milli park national park',landmark:'yer konu landmark kiyi',sea:'deniz sea bogaz kanal okyanus channel strait'};
+const searchDocs=places.map(p=>{
+ const shortName=detailOrder.shortNames[p.id]||'';
+ const empTerms=p.emphasis?[...p.emphasis.sourceTerms,...p.emphasis.labelTerms].join(' '):'';
+ const hVal=heights[p.id]?heights[p.id]+' m '+heights[p.id].toLocaleString('tr-TR')+' m':'';
+ const tEntries=['flora','fauna','relief'].filter(t=>themes[t]?.[p.id]).map(t=>{
+  const td=themes[t][p.id],raw=[td.focus,td.body.replace(/\|\|/g,' ').replace(/\*\*/g,''),td.extra||''].filter(Boolean).join(' · ');
+  return{layer:t,label:t==='flora'?'Flora':t==='fauna'?'Fauna':'Yükselti',raw,norm:norm(raw)};
+ });
+ const bodyClean=p.body.replace(/\|\|/g,' ').replace(/\*\*/g,'');
+ return{
+  p,
+  nameNorm:norm(p.name+' '+shortName+' '+p.id),
+  termsNorm:norm(empTerms),
+  metaNorm:norm(kinds[p.kind]+' '+(kindAliases[p.kind]||'')+' '+p.region+' s. '+p.pages+' sayfa '+p.pages+' '+hVal),
+  focusNorm:norm(p.focus),
+  bodyRaw:bodyClean+(p.extra?' · ★ '+p.extra:''),
+  bodyNorm:norm(bodyClean+' '+(p.extra||'')),
+  themes:tEntries
+ };
+});
+const filterDefs=[
+ ['all','Tümü'],
+ ['bold','Sarı vurgulu'],
+ ['lake','Göl'],
+ ['river','Nehir'],
+ ['mountain','Dağ'],
+ ['island','Ada'],
+ ['region','Bölge'],
+ ['nature','Doğa'],
+ ['other','Yer / Deniz']
+];
+let searchFilter='all',searchActive=-1,searchCurrent=[];
+function matchFilter(p,f){
+ if(f==='all')return true;
+ if(f==='bold')return Boolean(p.emphasis);
+ if(f==='other')return p.kind==='landmark'||p.kind==='sea'||p.kind==='country';
+ return p.kind===f;
+}
+function extractSnippet(rawText,tokens){
+ const clauses=rawText.split(/(?:\|\||(?<=[.!?])\s+|·)/).map(s=>s.trim()).filter(Boolean);
+ for(const c of clauses){const cn=norm(c);if(tokens.some(t=>cn.includes(t)))return c;}
+ return clauses[0]||rawText;
+}
+function highlightText(container,text,tokens){
+ if(!tokens.length){container.append(document.createTextNode(text));return;}
+ const textNorm=fold(text);
+ const ranges=[];
+ for(const t of tokens){
+  if(!t)continue;
+  let idx=0;
+  while((idx=textNorm.indexOf(t,idx))!==-1){ranges.push([idx,idx+t.length]);idx+=t.length;}
+ }
+ if(!ranges.length){container.append(document.createTextNode(text));return;}
+ ranges.sort((a,b)=>a[0]-b[0]||b[1]-a[1]);
+ const merged=[ranges[0]];
+ for(let i=1;i<ranges.length;i++){
+  const prev=merged[merged.length-1],cur=ranges[i];
+  if(cur[0]<=prev[1])prev[1]=Math.max(prev[1],cur[1]);else merged.push(cur);
+ }
+ let pos=0;
+ for(const [s,end]of merged){
+  if(s>pos)container.append(document.createTextNode(text.slice(pos,s)));
+  container.append(e('mark','',text.slice(s,end)));
+  pos=end;
+ }
+ if(pos<text.length)container.append(document.createTextNode(text.slice(pos)));
+}
+function querySearch(rawQuery='',filter=searchFilter){
+ const q=norm(rawQuery),tokens=q.split(' ').filter(Boolean);
+ const hits=[];
+ for(const d of searchDocs){
+  if(!matchFilter(d.p,filter))continue;
+  if(!tokens.length){
+   hits.push({p:d.p,score:(d.p.emphasis?200:0)-placeRank(d.p),snippet:d.p.focus,themeLayer:null,tokens:[]});
+   continue;
+  }
+  let score=0,ok=true,inHeader=true;
+  for(const t of tokens){
+   if(d.nameNorm===t||d.termsNorm===t)score+=1200;
+   else if(d.nameNorm.startsWith(t)||d.termsNorm.startsWith(t))score+=900;
+   else if(d.nameNorm.includes(' '+t)||d.termsNorm.includes(' '+t))score+=720;
+   else if(d.nameNorm.includes(t)||d.termsNorm.includes(t))score+=560;
+   else if(d.metaNorm.includes(t)){score+=360;inHeader=false;}
+   else if(d.focusNorm.includes(t)){score+=280;inHeader=false;}
+   else if(d.bodyNorm.includes(t)){score+=160;inHeader=false;}
+   else{
+    const th=d.themes.find(x=>x.norm.includes(t));
+    if(th){score+=150;inHeader=false;}
+    else{ok=false;break;}
+   }
+  }
+  if(!ok)continue;
+  if(d.p.emphasis)score+=25;
+  let snippet=d.p.focus,themeBadge=null,themeLayer=null;
+  const isHead=t=>d.nameNorm.includes(t)||d.termsNorm.includes(t)||d.metaNorm.includes(t)||d.focusNorm.includes(t);
+  const deepTokens=tokens.filter(t=>!isHead(t));
+  const matchedTheme=deepTokens.length?d.themes.find(x=>deepTokens.every(t=>x.norm.includes(t)))||d.themes.find(x=>deepTokens.some(t=>x.norm.includes(t))):null;
+  if(matchedTheme){
+   snippet=extractSnippet(matchedTheme.raw,deepTokens);
+   themeBadge=matchedTheme.label;
+   themeLayer=matchedTheme.layer;
+  }else if(deepTokens.length&&deepTokens.some(t=>d.bodyNorm.includes(t))){
+   snippet=extractSnippet(d.bodyRaw,deepTokens);
+   themeLayer='places';
+  }
+  hits.push({p:d.p,score:score-placeRank(d.p)*0.05,snippet,themeBadge,themeLayer,tokens});
+ }
+ return hits.sort((a,b)=>b.score-a.score);
+}
+const searchWrap=$('search-wrap'),searchInput=$('search-input'),searchClear=$('search-clear'),searchKbd=$('search-shortcut'),searchResults=$('search-results'),topActions=searchWrap?.parentElement;
+function isSearchOpen(){return searchResults&&!searchResults.hidden;}
+function closeSearch(){
+ if(!searchResults)return;
+ searchResults.hidden=true;
+ searchWrap.classList.remove('open');
+ topActions?.classList.remove('search-active');
+ searchInput.setAttribute('aria-expanded','false');
+ searchActive=-1;
+}
+function selectSearchHit(hit){
+ if(!hit)return;
+ closeSearch();
+ searchInput.blur();
+ if(hit.themeLayer&&(hit.themeLayer==='places'?Boolean(themes[layer]?.[hit.p.id]):Boolean(themes[hit.themeLayer]?.[hit.p.id]))){
+  layer=hit.themeLayer;syncLayer();engine?.redraw();
+ }
+ openPlace(hit.p.id,true);
+}
+function syncSearchActive(){
+ const items=searchResults.querySelectorAll('.search-item');
+ items.forEach((el,i)=>{
+  el.classList.toggle('active',i===searchActive);
+  el.setAttribute('aria-selected',String(i===searchActive));
+  if(i===searchActive&&typeof el.scrollIntoView==='function')el.scrollIntoView({block:'nearest'});
+ });
+}
+function renderSearch(){
+ if(!searchResults)return;
+ const q=searchInput.value;
+ searchClear.hidden=!q&&searchFilter==='all';
+ searchKbd.hidden=Boolean(q)||searchFilter!=='all';
+ searchCurrent=querySearch(q,searchFilter);
+ if(searchActive>=searchCurrent.length)searchActive=searchCurrent.length?0:-1;
+ searchResults.replaceChildren();
+ const filterRow=e('div','search-filters');
+ for(const [key,label]of filterDefs){
+  const chip=e('button','search-chip',label);chip.type='button';
+  chip.setAttribute('aria-pressed',String(searchFilter===key));
+  chip.addEventListener('mousedown',ev=>ev.preventDefault());
+  chip.addEventListener('click',()=>{searchFilter=searchFilter===key&&key!=='all'?'all':key;searchActive=0;renderSearch();searchInput.focus();});
+  filterRow.append(chip);
+ }
+ searchResults.append(filterRow);
+ const meta=e('div','search-meta');
+ meta.append(e('span','',searchCurrent.length+' yer / konu'),e('span','','↑↓ seç · Enter aç'));
+ searchResults.append(meta);
+ if(!searchCurrent.length){
+  searchResults.append(e('div','search-empty','Eşleşen yer veya konu bulunamadı.'));
+ }else{
+  searchCurrent.forEach((hit,idx)=>{
+   const item=e('button','search-item'+(idx===searchActive?' active':''));item.type='button';item.setAttribute('role','option');item.setAttribute('aria-selected',String(idx===searchActive));item.dataset.searchPlace=hit.p.id;
+   const head=e('div','search-item-head');
+   const dot=e('i','key '+(hit.p.kind==='mountain'?'mountain':hit.p.kind==='lake'||hit.p.kind==='river'?'lake':hit.p.kind==='island'?'island':hit.p.kind==='nature'?'nature':'landmark'));
+   dot.style.background=colors[hit.p.kind];
+   const title=emphasize(e('span','search-item-title'),hit.p,hit.p.name);
+   const right=e('span','search-item-meta',kinds[hit.p.kind].split(' / ')[0]+' · s. '+hit.p.pages);
+   head.append(dot,title,right);
+   const sub=e('p','search-item-sub');
+   if(hit.themeBadge)sub.append(e('span','search-badge',hit.themeBadge));
+   highlightText(sub,hit.snippet,hit.tokens);
+   item.append(head,sub);
+   item.addEventListener('mouseenter',()=>{searchActive=idx;syncSearchActive();});
+   item.addEventListener('click',()=>selectSearchHit(hit));
+   searchResults.append(item);
+  });
+ }
+ searchResults.hidden=false;
+ searchWrap.classList.add('open');
+ topActions?.classList.add('search-active');
+ searchInput.setAttribute('aria-expanded','true');
+}
+if(searchInput){
+ searchInput.addEventListener('focus',()=>{if(searchActive<0)searchActive=0;renderSearch();});
+ searchInput.addEventListener('input',()=>{searchActive=0;renderSearch();});
+ searchInput.addEventListener('keydown',ev=>{
+  if(ev.key==='ArrowDown'){ev.preventDefault();if(!isSearchOpen())renderSearch();else if(searchCurrent.length){searchActive=(searchActive+1)%searchCurrent.length;syncSearchActive();}}
+  else if(ev.key==='ArrowUp'){ev.preventDefault();if(!isSearchOpen())renderSearch();else if(searchCurrent.length){searchActive=(searchActive-1+searchCurrent.length)%searchCurrent.length;syncSearchActive();}}
+  else if(ev.key==='Enter'){if(searchCurrent.length){ev.preventDefault();selectSearchHit(searchCurrent[Math.max(0,searchActive)]);}}
+  else if(ev.key==='Escape'){if(isSearchOpen()||searchInput.value){ev.preventDefault();ev.stopPropagation();closeSearch();searchInput.blur();}}
+ });
+ searchClear.addEventListener('click',()=>{searchInput.value='';searchFilter='all';searchActive=0;renderSearch();searchInput.focus();});
+ document.addEventListener('pointerdown',ev=>{if(isSearchOpen()&&!ev.target?.closest?.('#search-wrap'))closeSearch();});
+}
+
+document.addEventListener('keydown',ev=>{
+ if((ev.key==='/'||((ev.metaKey||ev.ctrlKey)&&ev.key.toLowerCase()==='k'))&&searchInput&&document.activeElement!==searchInput&&!['INPUT','TEXTAREA'].includes(document.activeElement?.tagName)&&!$('about').open){
+  ev.preventDefault();searchInput.focus();searchInput.select();return;
+ }
+ if(ev.key==='Escape'){if(isSearchOpen()){closeSearch();searchInput?.blur();return;}closeCluster();if(!$('detail').hidden)closeDetail();}
+});
 window.addEventListener('hashchange',()=>{const id=decodeURIComponent(location.hash.slice(1));if(byId.has(id))openPlace(id);else closeDetail(false);});
 // Published Natural Earth polygons; geographic coordinates projected in Mercator.
 function buildMap(){
@@ -403,7 +649,7 @@ function buildMap(){
  function on(el,t,fn,opts){el.addEventListener(t,fn,opts);handlers.push([el,t,fn,opts]);}
  const pointers=new Map();let pinch=null,safariGesture=null,lastMouse=null;
  const surface=$('atlas');
- const readingPanel=ev=>Boolean(ev.target?.closest?.('#detail, #cluster-detail, #about'));
+ const readingPanel=ev=>Boolean(ev.target?.closest?.('#detail, #cluster-detail, #about, #search-wrap'));
  // The controls and HTML pins sit outside the SVG. Capture on the whole map
  // surface so a pinch still works while the cursor rests over a layer button.
  on(surface,'wheel',ev=>{
@@ -454,7 +700,7 @@ function buildMap(){
 
  $('attribution').hidden=false;$('attribution').innerHTML='<a href="https://www.naturalearthdata.com/" target="_blank" rel="noopener">Natural Earth</a> · <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">© OpenStreetMap</a> · <a href="https://www.ordnancesurvey.co.uk/products/os-open-rivers" target="_blank" rel="noopener">© Crown / OS</a> · <a href="https://doi.org/10.5285/b6b92ce3-dcd7-4f0b-8e43-e937ddf1d4eb" target="_blank" rel="noopener">UKCEH</a> · ★ Genelleştirilmiş';engine.home();window.__atlas.engine='vector';
 }
-window.__atlas={get layer(){return layer;},setLayer,get selected(){return selected;},get south(){return south;},get count(){return places.length;},get zoom(){return engine?.zoom();},revealZoom:id=>revealZoom(byId.get(id)),select:openPlace,home,groups:grouping,engine:'starting'};
+window.__atlas={get layer(){return layer;},setLayer,get selected(){return selected;},get south(){return south;},get count(){return places.length;},get zoom(){return engine?.zoom();},revealZoom:id=>revealZoom(byId.get(id)),select:openPlace,search:querySearch,home,groups:grouping,engine:'starting'};
 syncLayer();buildMap();const first=decodeURIComponent(location.hash.slice(1));if(byId.has(first))openPlace(first,true);
 let resizeTimer;window.addEventListener('resize',()=>{clearTimeout(resizeTimer);resizeTimer=setTimeout(()=>{if(selected)engine.go(byId.get(selected));else engine.home();},120);});
 })();
