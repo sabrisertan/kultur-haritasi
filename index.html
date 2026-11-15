@@ -99,7 +99,28 @@
 @media(pointer:coarse),(max-width:700px){.search-kbd{display:none}#search-input{font-size:16px}}
 @media(max-width:700px){.top-actions{top:18px;right:14px;gap:6px}.top-actions .glass-button{height:35px;padding:0 10px;font-size:11.5px;gap:5px;border-radius:11px}.search-wrap{width:118px}.search-bar{height:35px;padding:0 9px;border-radius:11px}#search-input{font-size:16px}.top-actions:not(.search-active) #search-input{transform:scale(.75);transform-origin:left center;width:133.33%;margin-right:-33.33%}.top-actions.search-active{left:16px;right:16px}.top-actions.search-active #about-open{display:none}.top-actions.search-active .search-wrap{width:100%}.search-results{left:0;right:0;width:auto;max-height:56dvh}}
 @media(max-width:380px){.search-wrap{width:104px}}
-@media(prefers-color-scheme:dark){:root,html,body,dialog,input,button{color-scheme:only light;forced-color-adjust:none}}
+@media(prefers-color-scheme:dark){:root,html,body,dialog,input,button,select{color-scheme:only light;forced-color-adjust:none}}
+
+/* Guided book tour & cartographic fly-to trajectory */
+.tour-trigger{position:absolute;z-index:650;left:30px;top:222px;padding:9px 14px;border-radius:12px;gap:7px;background:#fffefaed;border:1px solid #ccd9d5;box-shadow:0 4px 18px #193d480a;font-size:12px;font-weight:600}
+.tour-trigger:hover{background:#fff;border-color:#9bb4b8}
+.tour-trigger small{font-size:10.5px;color:var(--muted);font-weight:450;padding-left:4px;border-left:1px solid #d5e0dd}
+.tour-badge{font-size:13px;line-height:1}
+.tour-nav{display:flex;align-items:center;justify-content:space-between;gap:7px;padding:10px 14px;border-top:1px solid #e3ebe8;background:#f7faf7;border-radius:0 0 18px 18px;flex:none}
+.tour-step-btn{border:1px solid #cbd8d5;background:var(--paper);color:var(--ink);border-radius:10px;padding:8px 11px;font-size:11.5px;font-weight:600;display:flex;align-items:center;gap:4px;flex:none;transition:background .12s,border-color .12s}
+.tour-step-btn:hover{background:#eaf1ef;border-color:#9ab3b8}
+.tour-step-btn.primary{background:#234b48;border-color:#234b48;color:#fffefa}
+.tour-step-btn.primary:hover{background:#193937}
+.tour-center{position:relative;flex:1;min-width:0;text-align:center;padding:3px 4px;border-radius:8px;transition:background .12s}
+.tour-center:hover{background:#ebf1ed}
+.tour-progress{display:flex;flex-direction:column;align-items:center;gap:2px;pointer-events:none}
+.tour-counter{font-size:9.5px;font-weight:700;letter-spacing:.07em;color:#234b48;text-transform:uppercase;white-space:nowrap}
+.tour-section-label{font-size:10.5px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.tour-select{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer;font-size:16px;border:0;color-scheme:only light}
+.tour-arc{fill:none;stroke:#c67d3b;stroke-width:2;stroke-dasharray:5 4;stroke-linecap:round;vector-effect:non-scaling-stroke;opacity:.85}
+.tour-origin-ring{fill:#f1d77b38;stroke:#c67d3b;stroke-width:1.8;vector-effect:non-scaling-stroke}
+.pin.tour-origin .pin-dot{box-shadow:0 0 0 4px #f1d77b99,0 0 0 6px #c67d3b}
+@media(max-width:700px){.tour-trigger{left:16px;top:166px;padding:8px 11px;font-size:11px;border-radius:11px;gap:6px}.tour-trigger small{font-size:10px}.detail-open .tour-trigger{visibility:hidden}.tour-nav{padding:9px 12px;border-radius:0 0 17px 17px}.tour-step-btn{padding:8px 10px;font-size:11px;min-height:36px}}
 
 </style>
 
@@ -123,6 +144,11 @@
       <button id="layer-flora" aria-pressed="false">Flora</button>
       <button id="layer-fauna" aria-pressed="false">Fauna</button>
     </nav>
+    <button id="tour-open" class="tour-trigger glass-button" type="button" aria-label="Kitaptaki sırayla rehber turu başlat">
+      <span class="tour-badge" aria-hidden="true">📖</span>
+      <span id="tour-open-label">Kitap Turu</span>
+      <small id="tour-open-sub">1 / 125 · s. 6–24</small>
+    </button>
     <div class="top-actions">
       <div id="search-wrap" class="search-wrap" role="search" aria-label="Haritada yer ve konu ara">
         <div class="search-bar">
@@ -153,6 +179,17 @@
       <button id="detail-close" class="detail-close" aria-label="Yer bilgisini kapat">×</button>
       <div class="detail-heading"><p id="detail-type" class="eyebrow"></p><h2 id="detail-name"></h2><p id="detail-region"></p></div>
       <div id="detail-scroll" class="detail-scroll"><p id="detail-focus" class="focus-line"></p><div id="detail-body"></div><aside id="detail-extra" hidden></aside><div id="detail-related" class="related"></div><footer id="detail-source"></footer></div>
+      <nav id="tour-nav" class="tour-nav" aria-label="Kitap sırasıyla rehber tur">
+        <button id="tour-prev" class="tour-step-btn" type="button" aria-label="Kitap sırasındaki önceki yer">‹ <span>Önceki</span></button>
+        <div class="tour-center">
+          <div class="tour-progress" aria-hidden="true">
+            <span id="tour-counter" class="tour-counter">KİTAP TURU · 1 / 125 ▾</span>
+            <span id="tour-section-label" class="tour-section-label">s. 6–9 · Konum ve Denizler</span>
+          </div>
+          <select id="tour-select" class="tour-select" aria-label="Kitap sırasından bölüm veya yer seç"></select>
+        </div>
+        <button id="tour-next" class="tour-step-btn primary" type="button" aria-label="Kitap sırasındaki sonraki yer"><span>Sonraki</span> ›</button>
+      </nav>
     </section>
     <section id="cluster-detail" class="cluster-detail" aria-label="Yakın yerler" hidden><div class="cluster-heading"><span>Bu bölgede</span><button id="cluster-close" aria-label="Yakın yerleri kapat">×</button></div><div id="cluster-items"></div></section>
     <div id="status" role="status" class="status" hidden></div>
@@ -227,8 +264,8 @@ const detailOrder=window.ATLAS_DETAIL,waterById=new Map((window.ATLAS_WATER?.fea
 const overviewOrder=new Map(detailOrder.overview.map((id,i)=>[id,i])),regionalOrder=new Map(detailOrder.regional.map((id,i)=>[id,i]));
 function placeTier(p){return p.capital||p.kind==='country'?0:overviewOrder.has(p.id)?1:regionalOrder.has(p.id)?2:p.emphasis?3:4;}
 function revealZoom(p){return [0,5,6.4,7.4,8.4][placeTier(p)];}
-function revealed(p){return p.id===selected||p.capital||engine.zoom()>=revealZoom(p);}
-function placeRank(p){return p.id===selected?-1:p.capital?0:p.kind==='country'?10:placeTier(p)*100+(overviewOrder.get(p.id)??regionalOrder.get(p.id)??0);}
+function revealed(p){return p.id===selected||p.id===tourFromId||p.capital||engine.zoom()>=revealZoom(p);}
+function placeRank(p){return p.id===selected?-1:p.id===tourFromId?-.5:p.capital?0:p.kind==='country'?10:placeTier(p)*100+(overviewOrder.get(p.id)??regionalOrder.get(p.id)??0);}
 function mapName(p){return layer==='places'?(detailOrder.shortNames[p.id]||p.name):p.name;}
 const layerNames={places:'Yerler',relief:'Yükselti',flora:'Flora / bitki örtüsü',fauna:'Fauna / hayvanlar'};
 const reliefPlaces=new Set(['highlands','great-glen','central-lowlands','southern-uplands','lake-district','dartmoor','exmoor']);
@@ -250,7 +287,23 @@ const extraSources={
 const priority=['loch-ness','loch-lomond','neagh','bala','ben-nevis','snowdon','scafell','lake-district','wight','man','anglesey','shetlands','orkney','scilly','dover','thames','causeway','skomer','hebrides'];
 const ranks=new Map(priority.map((id,i)=>[id,i]));
 const reduceMotion=matchMedia('(prefers-reduced-motion: reduce)').matches;
-let selected=null,south=false,engine=null,layer='relief';
+let selected=null,south=false,engine=null,layer='relief',tourIndex=0,tourFromId=null;
+const tourSections=[
+ {title:'1 · Konum, Ülkeler ve Denizler (s. 6–9)',short:'s. 6–9 · Konum ve Denizler',layer:'places',items:['england','scotland','wales','northern-ireland','ireland','london','edinburgh','cardiff','belfast','lizard','greenwich','dunnet','channel','dover','north-sea','atlantic','irish-sea','north-channel','st-george','southeast']},
+ {title:'2 · Yükselti ve Yer Şekilleri (s. 10–12)',short:'s. 10–12 · Yükselti',layer:'places',items:[['exe','places'],['tyne','places'],['scotland','relief'],['highlands','relief'],['great-glen','relief'],['ben-nevis','relief'],['central-lowlands','relief'],['southern-uplands','relief'],['wales','relief'],['snowdon','relief'],['brecon','places'],['cader','places'],['berwin','places'],['cambrian','places'],['england','relief'],['moors','places'],['cotswolds','places'],['north-downs','places'],['south-downs','places'],['chilterns','places'],['fens','places'],['broads','places'],['marshes','places'],['pennines','places'],['peak-district','places'],['lake-district','relief'],['scafell','relief'],['cheviots','places'],['cornwall','places'],['exmoor','relief'],['dartmoor','relief'],['northern-ireland','relief'],['sperrin','places'],['antrim','places'],['mourne','places'],['slieve-donard','relief'],['causeway','places']]},
+ {title:'3 · Nehirler ve Göller (s. 12–13)',short:'s. 12–13 · Nehirler ve Göller',layer:'places',items:['thames','severn','wear','tees','mersey','trent','ouse','avon','tay','forth','clyde','shannon','lagan','foyle','bann','clwyd','conwy','dwyryd','mawddach','teifi','taff','loch-lomond','loch-ness','neagh','bala','windermere','ullswater','derwentwater','coniston']},
+ {title:'4 · Bitki Örtüsü ve Simgeler (s. 14–15)',short:'s. 14–15 · Flora ve Simgeler',layer:'flora',items:['england','scotland','wales','northern-ireland','ireland']},
+ {title:'5 · Hayvanlar ve Deniz Kuşu Adaları (s. 15–16)',short:'s. 15–16 · Fauna',layer:'fauna',items:['england','scotland','wales','skomer','grassholm','ramsey','caldey','northern-ireland','ireland','north-sea']},
+ {title:'6 · Milli Parklar ve Çevre Koruma (s. 16–22)',short:'s. 16–22 · Koruma ve Kurumlar',layer:'places',items:['northumberland','pembrokeshire','green-belt','durdle']},
+ {title:'7 · Büyük Adalar ve Crown Dependencies (s. 22–24)',short:'s. 22–24 · Adalar',layer:'places',items:['hebrides','iona','skye','orkney','shetlands','unst','man','snaefell','anglesey','scilly','lands-end','bishop','wight','solent','needles','cowes','parkhurst','jersey','guernsey','falklands']}
+];
+const tourSteps=[];
+tourSections.forEach((sec,si)=>{
+ for(const entry of sec.items){
+  const [id,stepLayer]=Array.isArray(entry)?entry:[entry,sec.layer];
+  if(byId.has(id))tourSteps.push({index:tourSteps.length,id,layer:stepLayer,sectionIndex:si,sectionTitle:sec.title,sectionShort:sec.short});
+ }
+});
 const viewport=()=>({w:$('map').clientWidth,h:$('map').clientHeight});
 const e=(tag,cls,text)=>{const n=document.createElement(tag);if(cls)n.className=cls;if(text!==undefined)n.textContent=text;return n;};
 function emphasize(node,p,text=p.name){
@@ -291,7 +344,7 @@ function heightChart(id){
  return chart;
 }
 function createPin(p,label){
- const b=e('button','pin '+p.kind+(p.capital?' capital':'')+(p.emphasis?' book-bold':'')+(selected===p.id?' active':''));b.type='button';b.style.setProperty('--pin',colors[p.kind]);b.dataset.place=p.id;
+ const b=e('button','pin '+p.kind+(p.capital?' capital':'')+(p.emphasis?' book-bold':'')+(selected===p.id?' active':'')+(tourFromId===p.id&&selected!==p.id?' tour-origin':''));b.type='button';b.style.setProperty('--pin',colors[p.kind]);b.dataset.place=p.id;
  if(layer==='places'&&waterById.has(p.id))b.classList.add('water-label');
  b.setAttribute('aria-label',p.name+(p.capital?' — Başkent':'')+(p.emphasis?' — Kitapta kalın, s. '+p.emphasis.page:'')+' — '+p.focus);b.setAttribute('aria-pressed',String(selected===p.id));
  const dot=e('span','pin-dot');
@@ -305,7 +358,7 @@ function createPin(p,label){
 function placeGrouping(){
  const {w,h}=viewport(),coarse=matchMedia('(pointer:coarse)').matches,half=coarse?20:15;
  const zoom=engine.zoom(),limit=w<700?(zoom<6.4?8:zoom<8.4?11:15):(zoom<6.4?14:zoom<8.4?20:27);
- const boxes=[{x:0,y:0,w:w<700?190:290,h:w<700?110:160},{x:w<700?12:30,y:w<700?118:165,w:300,h:48},{x:w-75,y:h*.4,w:75,h:155},{x:0,y:h-155,w:Math.min(w,480),h:155}];
+ const boxes=[{x:0,y:0,w:w<700?190:290,h:w<700?110:160},{x:w<700?12:30,y:w<700?118:165,w:300,h:92},{x:w-75,y:h*.4,w:75,h:155},{x:0,y:h-155,w:Math.min(w,480),h:155}];
  if(!$('detail').hidden)boxes.push(w<700?{x:0,y:h*.5,w,h:h*.5}:{x:w-430,y:80,w:365,h:h-100});
  const candidates=currentPoints().filter(revealed).map(p=>({...p,xy:engine.point(waterById.get(p.id)?.anchor||p)})).filter(p=>p.xy.x>4&&p.xy.x<w-4&&p.xy.y>4&&p.xy.y<h-24).sort((a,b)=>placeRank(a)-placeRank(b));
  const markers=candidates.filter(p=>!waterById.has(p.id)&&!['country','sea'].includes(p.kind));
@@ -316,7 +369,7 @@ function placeGrouping(){
   if(named&&zoom>8.4&&p.id!==selected)continue;
   const width=Math.max(24,name.length*(p.emphasis?6.6:6.1)+(named?12:0)),height=23,{x,y}=p.xy;
   let label=false;
-  if(labels<limit||p.id===selected||p.capital){
+  if(labels<limit||p.id===selected||p.id===tourFromId||p.capital){
    const offsets=named?[[x-width/2,y-12],[x-width/2,y-38],[x-width/2,y+16],[x-width-20,y-12],[x+20,y-12],[x-width/2,y-62],[x-width/2,y+40],[x-width-45,y-12],[x+45,y-12]]:[[x+12,y-12],[x-width-12,y-12],[x-width/2,y-32],[x-width/2,y+13],[x+13,y-34],[x-width-13,y+13]];
    for(const [lx,ly]of offsets){
     const box={x:lx,y:ly,w:width,h:height};
@@ -344,7 +397,7 @@ function grouping(){
  for(const p of singles){const near=groups.find(g=>!p.capital&&!(layer==='relief'&&heights[p.id])&&!fixed(g)&&Math.hypot(p.xy.x-g.x,p.xy.y-g.y)<radius);if(near){near.members.push(p);recenter(near);}else groups.push({x:p.xy.x,y:p.xy.y,members:[p]});}
  let merged=true;while(merged){merged=false;for(let i=0;i<groups.length&&!merged;i++)for(let j=i+1;j<groups.length;j++)if(!fixed(groups[i])&&!fixed(groups[j])&&Math.hypot(groups[i].x-groups[j].x,groups[i].y-groups[j].y)<radius){groups[i].members.push(...groups[j].members);recenter(groups[i]);groups.splice(j,1);merged=true;break;}}
  const boxes=groups.map(g=>{const r=g.members.length>1?11:4;return{x:g.x-r,y:g.y-r,w:r*2,h:r*2};});
- boxes.push({x:0,y:0,w:w<700?185:290,h:w<700?110:160},{x:w<700?12:30,y:w<700?118:165,w:300,h:48},{x:w-85,y:h*.4,w:85,h:155},{x:0,y:h-95,w:Math.min(w,480),h:95});
+ boxes.push({x:0,y:0,w:w<700?185:290,h:w<700?110:160},{x:w<700?12:30,y:w<700?118:165,w:300,h:92},{x:w-85,y:h*.4,w:85,h:155},{x:0,y:h-95,w:Math.min(w,480),h:95});
  const result=[];
  function placeLabel(x,y,name,main=false,bold=false){const width=name.length*(main?(bold?7.7:7.2):(bold?6.6:6.1)),height=20;const options=main?[[x-width/2,y-10],[x-width/2,y-36],[x-width/2,y+22],[x-width-22,y-10],[x+23,y-10],[x-width/2,y-68],[x-width/2,y+55],[x-width-50,y-10],[x+50,y-10]]:[[x+12,y-12],[x-width-12,y-12],[x+23,y-10],[x-width-23,y-10],[x-width/2,y-34],[x-width/2,y+18],[x+18,y-34],[x-width-18,y-34],[x+18,y+20],[x-width-18,y+20],[x+56,y-10]];
  for(const [lx,ly]of options){const box={x:lx,y:ly,w:width,h:height};if(lx>5&&lx+width<w-8&&ly>5&&ly+height<h-22&&!boxes.some(b=>overlap(b,box))){boxes.push(box);return box;}}return null;}
@@ -368,26 +421,82 @@ function renderMarkers(){
 function showCluster(members){$('detail').hidden=true;$('atlas').classList.remove('detail-open');$('cluster-items').replaceChildren(...members.map(p=>{const b=emphasize(e('button',''),p);b.addEventListener('click',()=>openPlace(p.id,false));return b;}));$('cluster-detail').hidden=false;}
 function closeCluster(){$('cluster-detail').hidden=true;}
 function closeDetail(updateHash=true){
- const previous=selected;selected=null;$('detail').hidden=true;$('atlas').classList.remove('detail-open');closeCluster();engine?.refreshWater();renderMarkers();
+ const previous=selected;selected=null;tourFromId=null;$('detail').hidden=true;$('atlas').classList.remove('detail-open');closeCluster();engine?.refreshWater();renderMarkers();
  if(updateHash&&location.hash)history.replaceState(null,'',location.pathname+location.search);
  document.title='Britain Atlas · Kültür Tarihi';
  if(previous){const pin=document.querySelector('[data-place="'+previous+'"]');if(pin)pin.focus({preventScroll:true});}
 }
-function openPlace(id,travel=true){
+function syncTourUI(){
+ const total=tourSteps.length,step=tourSteps[tourIndex]||tourSteps[0];
+ if(!step)return;
+ const nextStep=tourSteps[(tourIndex+1)%total],nextP=byId.get(nextStep.id);
+ if($('tour-counter'))$('tour-counter').textContent='KİTAP TURU · '+(tourIndex+1)+' / '+total+' ▾';
+ if($('tour-section-label'))$('tour-section-label').textContent=step.sectionShort+(nextP?' · Sonraki: '+nextP.name:'');
+ if($('tour-select'))$('tour-select').value=String(tourIndex);
+ if($('tour-open-sub'))$('tour-open-sub').textContent=(tourIndex+1)+' / '+total+' · '+step.sectionShort.split(' · ')[0];
+ if($('tour-prev')){
+  const prevStep=tourSteps[(tourIndex-1+total)%total],prevP=byId.get(prevStep.id);
+  $('tour-prev').setAttribute('aria-label','Önceki durak: '+(prevP?prevP.name:''));
+ }
+ if($('tour-next')&&nextP)$('tour-next').setAttribute('aria-label','Sonraki durak: '+nextP.name);
+}
+function openPlace(id,travel=true,fromId=null){
  const original=byId.get(id);if(!original)return;
+ tourFromId=fromId&&fromId!==id?fromId:null;
  if(!inLayer(original)&&!waterById.has(id)&&id!=='falklands'){layer='places';syncLayer();engine.redraw();}
+ const matchIdx=tourSteps.findIndex(s=>s.id===id&&s.layer===layer);
+ const fallbackIdx=matchIdx!==-1?matchIdx:tourSteps.findIndex(s=>s.id===id);
+ if(fallbackIdx!==-1)tourIndex=fallbackIdx;
  const p={...original,...themes[layer]?.[id]};const changeRegion=(id==='falklands')!==south;south=id==='falklands';selected=id;closeCluster();syncRegion();if(changeRegion)engine.home();
  const hasTheme=Boolean(themes[layer]?.[id])||(layer==='relief'&&(original.kind==='mountain'||reliefPlaces.has(id)));
  $('detail-type').textContent=(hasTheme?layerNames[layer]+' · ':'')+kinds[p.kind];$('detail-type').style.color=colors[p.kind];emphasize($('detail-name'),p);$('detail-region').textContent=p.region;$('detail-focus').textContent=p.focus;
  $('detail-body').replaceChildren(...p.body.split('||').map(paragraph));if(heights[id])$('detail-body').append(heightChart(id));$('detail-extra').hidden=!p.extra;$('detail-extra').textContent=p.extra?'★ '+p.extra:'';
  if(p.extra&&extraSources[id]){const [label,url]=extraSources[id],a=e('a','',label+' ↗');a.href=url;a.target='_blank';a.rel='noopener';$('detail-extra').append(e('br'),a);}
- const rel=$('detail-related');rel.replaceChildren();if(p.related.length){rel.append(e('span','','HARİTADA BAĞLANTI KUR'));for(const id of p.related){const q=byId.get(id),b=emphasize(e('button',''),q,q.name+' ↗');b.addEventListener('click',()=>openPlace(id,true));rel.append(b);}}
+ const rel=$('detail-related');rel.replaceChildren();if(p.related.length){rel.append(e('span','','HARİTADA BAĞLANTI KUR'));for(const rid of p.related){const q=byId.get(rid),b=emphasize(e('button',''),q,q.name+' ↗');b.addEventListener('click',()=>openPlace(rid,'fly',id));rel.append(b);}}
  const source=$('detail-source');source.replaceChildren(e('span','','BRITAIN TODAY · BASILI S. '+p.pages));const link=e('a','','Haritadaki konum ↗');link.href='https://www.openstreetmap.org/?mlat='+p.lat+'&mlon='+p.lon+'#map=10/'+p.lat+'/'+p.lon;link.target='_blank';link.rel='noopener';source.append(e('br'),link);if(p.emphasis)source.append(e('br'),e('span','book-source-note','Kitapta '+(p.emphasis.type==='heading'?'kalın ülke başlığı':'kalın / kalın italik ad')+' · s. '+p.emphasis.page+' · '+p.emphasis.sourceTerms.join(' / ')));
  if(waterById.has(id)){const water=waterById.get(id);source.append(e('br'),e('span','','★ Harita çizgisi / alanı: '+water.provider+' · Genelleştirilmiş geometri.'+(water.coverageNote?' '+water.coverageNote:'')));}
  else if(p.kind==='river'||p.kind==='lake')source.append(e('br'),e('span','','★ Bu yer için çizgi / alan verisi mevcut değil; nokta yaklaşık konumunu gösterir.'));
+ syncTourUI();
  $('detail').hidden=false;$('atlas').classList.add('detail-open');$('detail-scroll').scrollTop=0;
- if(travel&&!changeRegion)engine.go(p);else engine.reveal(p);engine.refreshWater();renderMarkers();history.replaceState(null,'','#'+id);document.title=p.name+' · Britain Atlas';$('detail-close').focus({preventScroll:true});
+ if(travel==='fly')engine.fly(p);else if(travel&&!changeRegion)engine.go(p);else engine.reveal(p);
+ engine.refreshWater();renderMarkers();history.replaceState(null,'','#'+id);document.title=p.name+' · Britain Atlas';
+ const activeEl=document.activeElement;
+ if(!activeEl||!['tour-next','tour-prev','tour-select'].includes(activeEl.id))$('detail-close').focus({preventScroll:true});
 }
+function tourGo(idx){
+ if(!tourSteps.length)return;
+ const total=tourSteps.length;
+ const nextIdx=((idx%total)+total)%total;
+ const prevId=selected||tourSteps[tourIndex]?.id||null;
+ tourIndex=nextIdx;
+ const step=tourSteps[tourIndex];
+ if(layer!==step.layer){layer=step.layer;south=step.id==='falklands';syncLayer();engine?.redraw();}
+ openPlace(step.id,'fly',prevId);
+}
+function tourStep(delta){
+ if($('detail').hidden){tourGo(tourIndex);return;}
+ tourGo(tourIndex+delta);
+}
+if($('tour-select')){
+ const sel=$('tour-select');sel.replaceChildren();
+ tourSections.forEach((sec,si)=>{
+  const grp=document.createElement('optgroup');grp.label=sec.title;
+  tourSteps.filter(s=>s.sectionIndex===si).forEach(s=>{
+   const p=byId.get(s.id),opt=document.createElement('option');
+   const tag=s.layer==='relief'&&themes.relief?.[s.id]?' · Yükselti':s.layer==='flora'?' · Flora':s.layer==='fauna'&&themes.fauna?.[s.id]?' · Fauna':'';
+   const pages=themes[s.layer]?.[s.id]?.pages||p.pages;
+   opt.value=String(s.index);
+   opt.textContent=(s.index+1)+'. '+p.name+tag+' (s. '+pages+')';
+   grp.append(opt);
+  });
+  sel.append(grp);
+ });
+ sel.addEventListener('change',()=>tourGo(Number(sel.value)||0));
+}
+$('tour-open')?.addEventListener('click',()=>tourGo(selected?tourIndex:0));
+$('tour-prev')?.addEventListener('click',()=>tourStep(-1));
+$('tour-next')?.addEventListener('click',()=>tourStep(1));
+syncTourUI();
 function syncRegion(){$('falklands').hidden=south;$('return-britain').hidden=!south;$('map-hint').textContent=south?'Falklands · Güney Atlantik’teki gerçek konumu':layer==='relief'?'★ Şematik yükselti · Zirveye dokun, metreleri karşılaştır.':layer==='flora'?'Oak, thistle, shamrock… Hangi ülkede?':layer==='fauna'?'Hayvanları yaşadıkları yerlerle eşleştir.':'Yakınlaş → daha fazla yer açılır. Nehre veya göle dokun.';$('map-legend').hidden=south;}
 function home(){south=false;syncRegion();closeDetail();engine.home();}
 $('zoom-in').addEventListener('click',()=>engine.step(1));$('zoom-out').addEventListener('click',()=>engine.step(-1));$('home').addEventListener('click',home);$('falklands').addEventListener('click',()=>openPlace('falklands'));$('return-britain').addEventListener('click',home);
@@ -600,8 +709,12 @@ if(searchInput){
 }
 
 document.addEventListener('keydown',ev=>{
- if((ev.key==='/'||((ev.metaKey||ev.ctrlKey)&&ev.key.toLowerCase()==='k'))&&searchInput&&document.activeElement!==searchInput&&!['INPUT','TEXTAREA'].includes(document.activeElement?.tagName)&&!$('about').open){
+ if((ev.key==='/'||((ev.metaKey||ev.ctrlKey)&&ev.key.toLowerCase()==='k'))&&searchInput&&document.activeElement!==searchInput&&!['INPUT','TEXTAREA','SELECT'].includes(document.activeElement?.tagName)&&!$('about').open){
   ev.preventDefault();searchInput.focus();searchInput.select();return;
+ }
+ if(!$('detail').hidden&&!$('about').open&&!isSearchOpen()&&!['INPUT','TEXTAREA','SELECT'].includes(document.activeElement?.tagName)&&document.activeElement!==$('map')){
+  if(ev.key==='ArrowRight'||ev.key===']'){ev.preventDefault();tourStep(1);return;}
+  if(ev.key==='ArrowLeft'||ev.key==='['){ev.preventDefault();tourStep(-1);return;}
  }
  if(ev.key==='Escape'){if($('about').open||Date.now()-aboutClosedAt<80)return;if(isSearchOpen()){closeSearch();searchInput?.blur();return;}if(!$('cluster-detail').hidden){closeCluster();return;}if(!$('detail').hidden)closeDetail();}
 });
@@ -615,12 +728,27 @@ function buildMap(){
  const pt=p=>{const[x,y]=raw(p.lon,p.lat);return{x:x*scale+tx,y:y*scale+ty};};
  function shape(g){const polys=g.type==='MultiPolygon'?g.coordinates:[g.coordinates];return polys.map(poly=>poly.map(ring=>ring.map((c,i)=>{const a=raw(c[0],c[1]);return(i?'L':'M')+(a[0]*scale+tx).toFixed(2)+','+(a[1]*scale+ty).toFixed(2);}).join('')+'Z').join('')).join('');}
  // Base countries remain the click targets; thematic paint never captures input.
- const defs=document.createElementNS(NS,'defs'),terrain=document.createElementNS(NS,'g'),edges=document.createElementNS(NS,'g'),water=document.createElementNS(NS,'g');
+ const defs=document.createElementNS(NS,'defs'),terrain=document.createElementNS(NS,'g'),edges=document.createElementNS(NS,'g'),water=document.createElementNS(NS,'g'),tourOverlay=document.createElementNS(NS,'g');
  water.setAttribute('class','water-features');
- terrain.setAttribute('pointer-events','none');edges.setAttribute('pointer-events','none');svg.append(defs,terrain,edges,water);
+ tourOverlay.setAttribute('class','tour-overlay');tourOverlay.setAttribute('pointer-events','none');
+ terrain.setAttribute('pointer-events','none');edges.setAttribute('pointer-events','none');svg.append(defs,terrain,edges,water,tourOverlay);
  const countryIds={SCT:'scotland',ENG:'england',WLS:'wales',NIR:'northern-ireland',IRL:'ireland',IMN:'man',JEY:'jersey',GGY:'guernsey',FLK:'falklands'};
  const reliefIds=new Set(['SCT','ENG','WLS','NIR']);
  function svgPath(d,cls){const path=document.createElementNS(NS,'path');path.setAttribute('d',d);path.setAttribute('class',cls);path.setAttribute('fill-rule','evenodd');return path;}
+ function drawTourArc(){
+  tourOverlay.replaceChildren();
+  if(south||!tourFromId||!selected||tourFromId===selected)return;
+  const fromP=byId.get(tourFromId),toP=byId.get(selected);
+  if(!fromP||!toP||fromP.id==='falklands'||toP.id==='falklands')return;
+  const a=pt(waterById.get(fromP.id)?.anchor||fromP),b=pt(waterById.get(toP.id)?.anchor||toP);
+  const dx=b.x-a.x,dy=b.y-a.y,dist=Math.hypot(dx,dy);
+  if(dist<8)return;
+  const cx=(a.x+b.x)/2-dy*.18,cy=(a.y+b.y)/2+dx*.18;
+  const ring=document.createElementNS(NS,'circle');
+  ring.setAttribute('cx',a.x.toFixed(1));ring.setAttribute('cy',a.y.toFixed(1));ring.setAttribute('r','6');ring.setAttribute('class','tour-origin-ring');
+  const arc=svgPath('M'+a.x.toFixed(1)+','+a.y.toFixed(1)+'Q'+cx.toFixed(1)+','+cy.toFixed(1)+' '+b.x.toFixed(1)+','+b.y.toFixed(1),'tour-arc');
+  tourOverlay.append(ring,arc);
+ }
  function waterShape(g){
   if(g.type==='Polygon'||g.type==='MultiPolygon')return shape(g);
   const lines=g.type==='LineString'?[g.coordinates]:g.coordinates;
@@ -663,20 +791,50 @@ function buildMap(){
    const low=document.createElementNS(NS,'rect');low.setAttribute('width',w);low.setAttribute('height',h);low.setAttribute('class','terrain-low');terrain.append(low);
    for(const zone of window.ATLAS_RELIEF){terrain.append(svgPath(shape({type:'Polygon',coordinates:[zone.ring]}),'terrain-'+zone.band));}
   }
-  drawWater();renderMarkers();
+  drawWater();drawTourArc();renderMarkers();
  }
- let lastVp=viewport();
+ let lastVp=viewport(),flyRaf=0,flyTimer=0;
+ function cancelFly(){if(flyRaf){cancelAnimationFrame(flyRaf);flyRaf=0;}if(flyTimer){clearTimeout(flyTimer);flyTimer=0;}}
  function fitBounds(bounds,pad=55){const{w,h}=viewport(),a=raw(bounds[0][1],bounds[0][0]),b=raw(bounds[1][1],bounds[1][0]);scale=Math.min((w-pad*2)/Math.abs(b[0]-a[0]),(h-185)/Math.abs(b[1]-a[1]));tx=w/2-scale*(a[0]+b[0])/2;ty=(h-20)/2-scale*(a[1]+b[1])/2;draw();}
  function zoomAt(factor,x,y){scale*=factor;tx=x+(tx-x)*factor;ty=y+(ty-y)*factor;level+=Math.log2(factor);draw();}
- engine={name:'vector',point:pt,zoom:()=>level,redraw:draw,refreshWater:drawWater,clearPins:()=>pins.replaceChildren(),
+ engine={name:'vector',point:pt,zoom:()=>level,redraw:draw,refreshWater:()=>{drawWater();drawTourArc();},clearPins:()=>pins.replaceChildren(),
  pin:(x,y,b,centered,cluster)=>{const size=matchMedia('(pointer:coarse)').matches?40:(cluster?32:30);b.style.left=(centered?x:x-size/2)+'px';b.style.top=(y-size/2)+'px';pins.append(b);},
- step:d=>{if(level+d<3||level+d>13)return;const{w,h}=viewport();zoomAt(2**d,w/2,h/2);},
- home:()=>{safariGesture=null;level=south?6:5.5;fitBounds(south?[[-54,-65],[-50,-55]]:[[49.1,-10.8],[61.15,2.6]],28);},
- go:p=>{const{w,h}=viewport(),target=p.kind==='country'?6.2:(p.kind==='region'||p.kind==='sea')?7:8,next=p.kind==='country'?Math.min(Math.max(level,6.2),6.8):Math.max(level,target),factor=2**(next-level);scale*=factor;level=next;const a=raw(p.lon,p.lat);tx=(w>700?w*.36:w*.5)-a[0]*scale;ty=(w>700?h*.45:h*.28)-a[1]*scale;draw();},
+ step:d=>{cancelFly();if(level+d<3||level+d>13)return;const{w,h}=viewport();zoomAt(2**d,w/2,h/2);},
+ home:()=>{cancelFly();safariGesture=null;level=south?6:5.5;fitBounds(south?[[-54,-65],[-50,-55]]:[[49.1,-10.8],[61.15,2.6]],28);},
+ go:p=>{cancelFly();const{w,h}=viewport(),target=p.kind==='country'?6.2:(p.kind==='region'||p.kind==='sea')?7:8,next=p.kind==='country'?Math.min(Math.max(level,6.2),6.8):Math.max(level,target),factor=2**(next-level);scale*=factor;level=next;const a=raw(p.lon,p.lat);tx=(w>700?w*.36:w*.5)-a[0]*scale;ty=(w>700?h*.45:h*.28)-a[1]*scale;draw();},
+ fly:p=>{
+  cancelFly();
+  if(reduceMotion||typeof requestAnimationFrame!=='function'||typeof performance==='undefined'){engine.go(p);return;}
+  const{w,h}=viewport(),focusX=w>700?w*.36:w*.5,focusY=w>700?h*.45:h*.28;
+  const z0=level,baseScale=scale/(2**z0),rx0=(focusX-tx)/scale,ry0=(focusY-ty)/scale;
+  const[rx1,ry1]=raw(p.lon,p.lat);
+  const z1=p.kind==='country'?6.3:(p.kind==='region'||p.kind==='sea')?7.2:8.2;
+  const scale8=baseScale*(2**8),pixelDist=Math.hypot((rx1-rx0)*scale8,(ry1-ry0)*scale8);
+  const minZ=Math.min(z0,z1),idealMid=Math.max(5.35,Math.min(minZ-.65,8.2-Math.log2(1+pixelDist/150)));
+  const dip=Math.max(.55,minZ-idealMid);
+  const duration=Math.round(Math.min(480,Math.max(320,260+Math.sqrt(pixelDist)*6)));
+  const start=performance.now();
+  const schedule=()=>{
+   flyRaf=requestAnimationFrame(tick);
+   flyTimer=setTimeout(()=>{if(flyRaf){cancelAnimationFrame(flyRaf);flyRaf=0;}tick(performance.now());},16);
+  };
+  const tick=now=>{
+   if(flyTimer){clearTimeout(flyTimer);flyTimer=0;}
+   const u=Math.min(1,Math.max(0,(now-start)/duration));
+   const e=u<.5?4*u*u*u:1-((-2*u+2)**3)/2;
+   level=z0+(z1-z0)*e-dip*Math.sin(Math.PI*e);
+   scale=baseScale*(2**level);
+   const rx=rx0+(rx1-rx0)*e,ry=ry0+(ry1-ry0)*e;
+   tx=focusX-rx*scale;ty=focusY-ry*scale;
+   draw();
+   if(u<1)schedule();else flyRaf=0;
+  };
+  schedule();
+ },
  reveal:p=>{const{w,h}=viewport(),a=pt(p);if(w<=700&&a.y>h*.42){ty+=h*.27-a.y;draw();}else if(w>700&&a.x>w-440){tx+=w*.42-a.x;draw();}},
- fit:(ps,z)=>{const{w,h}=viewport(),center={lon:ps.reduce((s,p)=>s+p.lon,0)/ps.length,lat:ps.reduce((s,p)=>s+p.lat,0)/ps.length},a=raw(center.lon,center.lat);scale*=2**(z-level);level=z;tx=w/2-a[0]*scale;ty=h*.45-a[1]*scale;draw();},
+ fit:(ps,z)=>{cancelFly();const{w,h}=viewport(),center={lon:ps.reduce((s,p)=>s+p.lon,0)/ps.length,lat:ps.reduce((s,p)=>s+p.lat,0)/ps.length},a=raw(center.lon,center.lat);scale*=2**(z-level);level=z;tx=w/2-a[0]*scale;ty=h*.45-a[1]*scale;draw();},
  resize:()=>{const{w,h}=viewport();if(!w||!h||(w===lastVp.w&&h===lastVp.h))return;tx+=(w-lastVp.w)/2;ty+=(h-lastVp.h)/2;draw();},
- destroy:()=>{handlers.forEach(([el,t,fn,opts])=>el.removeEventListener(t,fn,opts));container.replaceChildren();}};
+ destroy:()=>{cancelFly();handlers.forEach(([el,t,fn,opts])=>el.removeEventListener(t,fn,opts));container.replaceChildren();}};
  function on(el,t,fn,opts){el.addEventListener(t,fn,opts);handlers.push([el,t,fn,opts]);}
  const pointers=new Map();let pinch=null,safariGesture=null,lastMouse=null,startPin=null;
  const surface=$('atlas');
@@ -686,6 +844,7 @@ function buildMap(){
  on(surface,'wheel',ev=>{
   if(readingPanel(ev))return;
   ev.preventDefault();
+  cancelFly();
   if(safariGesture&&Date.now()-safariGesture.updated<160)return;
   safariGesture=null;
   if(!Number.isFinite(ev.deltaY)||ev.deltaY===0)return;
@@ -708,6 +867,7 @@ function buildMap(){
  on(surface,'gesturestart',ev=>{
   if(readingPanel(ev)){safariGesture=null;return;}
   ev.preventDefault();
+  cancelFly();
   safariGesture={scale:Number.isFinite(ev.scale)&&ev.scale>0?ev.scale:1,anchor:gestureAnchor(ev),touchDriven:pointers.size>0,updated:Date.now()};
  },gestureOptions);
  on(surface,'gesturechange',ev=>{
@@ -726,6 +886,7 @@ function buildMap(){
  function onPointerDown(ev){
   if(ev._mapHandled||(ev.button&&ev.button!==0))return;
   ev._mapHandled=true;
+  cancelFly();
   if(pointers.size===0){
    const pinHit=ev.target?.closest?.('.pin, .cluster-pin');
    startPin=pinHit?.tagName==='BUTTON'?pinHit:null;
@@ -777,7 +938,7 @@ function buildMap(){
 
  $('attribution').hidden=false;$('attribution').innerHTML='<a href="https://www.naturalearthdata.com/" target="_blank" rel="noopener">Natural Earth</a> · <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">© OpenStreetMap</a> · <a href="https://www.ordnancesurvey.co.uk/products/os-open-rivers" target="_blank" rel="noopener">© Crown / OS</a> · <a href="https://doi.org/10.5285/b6b92ce3-dcd7-4f0b-8e43-e937ddf1d4eb" target="_blank" rel="noopener">UKCEH</a> · ★ Genelleştirilmiş';engine.home();window.__atlas.engine='vector';
 }
-window.__atlas={get layer(){return layer;},setLayer,get selected(){return selected;},get south(){return south;},get count(){return places.length;},get zoom(){return engine?.zoom();},revealZoom:id=>revealZoom(byId.get(id)),select:openPlace,search:querySearch,home,groups:grouping,engine:'starting'};
+window.__atlas={get layer(){return layer;},setLayer,get selected(){return selected;},get south(){return south;},get count(){return places.length;},get zoom(){return engine?.zoom();},revealZoom:id=>revealZoom(byId.get(id)),select:openPlace,search:querySearch,home,groups:grouping,tourSteps,get tourIndex(){return tourIndex;},tourGo,tourNext:()=>tourStep(1),tourPrev:()=>tourStep(-1),engine:'starting'};
 syncLayer();buildMap();const first=decodeURIComponent(location.hash.slice(1));if(byId.has(first))openPlace(first,true);
 let resizeTimer;window.addEventListener('resize',()=>{clearTimeout(resizeTimer);resizeTimer=setTimeout(()=>engine?.resize(),80);});
 })();
