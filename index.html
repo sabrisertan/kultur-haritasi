@@ -48,20 +48,22 @@
 #atlas[data-layer=places] .water-label .pin-dot{display:none}
 #atlas[data-layer=places] .water-label .pin-label{pointer-events:auto;color:#286784;cursor:pointer}
 .water-paint{pointer-events:none;stroke-linejoin:round;stroke-linecap:round;vector-effect:non-scaling-stroke}
-.water-river{fill:none;stroke:#246d8c;stroke-width:1.95;opacity:.92}
-.water-lake{fill:#95c2d1;stroke:#246d8c;stroke-width:1.1}
+.water-river{fill:none;stroke:#4f8ba0;stroke-width:1.65}
+.water-lake{fill:#a6cbd7;stroke:#578fa3;stroke-width:1}
 .water-hit{fill:none;stroke:transparent;stroke-width:14;pointer-events:stroke;cursor:pointer;vector-effect:non-scaling-stroke}
 .water-hit.lake-hit{fill:transparent;stroke-width:9;pointer-events:all}
-.water-feature:hover .water-river,.water-feature.selected .water-river,.water-feature:focus .water-river{stroke:#0e4f6b;stroke-width:3.2;opacity:1}
-.water-feature:hover .water-lake,.water-feature.selected .water-lake,.water-feature:focus .water-lake{fill:#66aec7;stroke:#0e4f6b;stroke-width:2.1}
+.water-feature:hover .water-river,.water-feature.selected .water-river,.water-feature:focus .water-river{stroke:#1c6585;stroke-width:3}
+.water-feature:hover .water-lake,.water-feature.selected .water-lake,.water-feature:focus .water-lake{fill:#73b3c9;stroke:#1c6585;stroke-width:2}
 .water-feature:focus{outline:none}
-.key.river-line{width:17px;height:2px;border-radius:1px;background:#246d8c}
-.key.lake-area{width:12px;height:8px;border:1px solid #246d8c;border-radius:45%;background:#95c2d1}
-.pin.capital{z-index:25!important}
-.pin.capital .pin-dot,#atlas[data-layer=places] .pin.capital .pin-dot{width:20px;height:20px;background:#b83b2a;color:#fffdf4;border:2px solid #fffefa;border-radius:50%;font-size:11.5px;line-height:1;display:grid;place-items:center;box-shadow:0 2px 6px #122c4b4d,0 0 0 1.5px #d49b27}
-.pin.capital .pin-label,#atlas[data-layer=places] .pin.capital .pin-label{font-weight:750;color:#681c12;font-size:11.5px;text-shadow:0 0 4px #fffefa,0 0 8px #fffefa,0 1px 2px #fffefa}
-.key.capital-star{width:14px;height:14px;background:#b83b2a;color:#fffdf4;border-radius:50%;display:inline-grid;place-items:center;font-size:9px;font-style:normal;line-height:1;box-shadow:0 0 0 1px #d49b27}
-.key.capital-star::before{content:"★"}
+.key.river-line{width:17px;height:2px;border-radius:1px;background:#4f8ba0}
+.key.lake-area{width:12px;height:8px;border:1px solid #578fa3;border-radius:45%;background:#a6cbd7}
+.pin.capital{z-index:18}
+.pin.capital .pin-dot,#atlas[data-layer=places] .pin.capital .pin-dot{width:16px;height:16px;border:0;border-radius:0;background:none;box-shadow:none;display:grid;place-items:center;filter:drop-shadow(0 1px 2.5px #122c4b40)}
+.pin.capital .pin-dot svg{width:16px;height:16px;display:block;overflow:visible}
+.pin.capital .pin-dot path{fill:var(--pin);stroke:#fffefa;stroke-width:1.9;stroke-linejoin:round}
+.pin.capital:hover .pin-dot,.pin.capital.active .pin-dot{box-shadow:none;transform:scale(1.16);filter:drop-shadow(0 0 3px #fffefa) drop-shadow(0 1px 4px #122c4b66)}
+.pin.capital .pin-label,#atlas[data-layer=places] .pin.capital .pin-label{font-weight:600;color:var(--ink)}
+.key.capital-star{background:var(--ink);clip-path:polygon(50% 2%,63% 36%,98% 36%,70% 57%,81% 92%,50% 71%,19% 92%,30% 57%,2% 36%,37% 36%);border-radius:0;width:10px;height:10px}
 @media(pointer:coarse){.water-hit{stroke-width:22}.water-hit.lake-hit{stroke-width:15}}
 
 /* Search bar and instant index results */
@@ -216,7 +218,7 @@ window.ATLAS_WATER = {"source":"OS Open Rivers 2026-10; OpenStreetMap/Geofabrik 
 const places=window.ATLAS_DATA.points,byId=new Map(places.map(p=>[p.id,p]));
 const $=id=>document.getElementById(id);
 const kinds={capital:'Başkent',country:'Ülke / genel konular',region:'Bölge',mountain:'Dağ / yüksek alan',lake:'Göl',river:'Nehir',island:'Ada',nature:'Doğa / koruma',landmark:'Yer / konu',sea:'Deniz / geçiş'};
-const colors={capital:'#b83b2a',country:'#234b58',region:'#6d7d57',mountain:'#a76b3d',lake:'#297b9e',river:'#297b9e',island:'#786498',nature:'#477a50',landmark:'#b26a53',sea:'#457e94'};
+const colors={capital:'#193d48',country:'#234b58',region:'#6d7d57',mountain:'#a76b3d',lake:'#297b9e',river:'#297b9e',island:'#786498',nature:'#477a50',landmark:'#b26a53',sea:'#457e94'};
 const themes=window.ATLAS_DATA.themes,heights=window.ATLAS_DATA.peakHeights;
 const detailOrder=window.ATLAS_DETAIL,waterById=new Map((window.ATLAS_WATER?.features||[]).map(f=>[f.id,f]));
 const overviewOrder=new Map(detailOrder.overview.map((id,i)=>[id,i])),regionalOrder=new Map(detailOrder.regional.map((id,i)=>[id,i]));
@@ -288,7 +290,10 @@ function heightChart(id){
 function createPin(p,label){
  const b=e('button','pin '+p.kind+(p.capital?' capital':'')+(p.emphasis?' book-bold':'')+(selected===p.id?' active':''));b.type='button';b.style.setProperty('--pin',colors[p.kind]);b.dataset.place=p.id;
  if(layer==='places'&&waterById.has(p.id))b.classList.add('water-label');
- b.setAttribute('aria-label',p.name+(p.capital?' — Başkent':'')+(p.emphasis?' — Kitapta kalın, s. '+p.emphasis.page:'')+' — '+p.focus);b.setAttribute('aria-pressed',String(selected===p.id));b.append(e('span','pin-dot',p.capital?'★':''));
+ b.setAttribute('aria-label',p.name+(p.capital?' — Başkent':'')+(p.emphasis?' — Kitapta kalın, s. '+p.emphasis.page:'')+' — '+p.focus);b.setAttribute('aria-pressed',String(selected===p.id));
+ const dot=e('span','pin-dot');
+ if(p.capital){const NS='http://www.w3.org/2000/svg',s=document.createElementNS(NS,'svg'),path=document.createElementNS(NS,'path');s.setAttribute('viewBox','0 0 20 20');s.setAttribute('aria-hidden','true');path.setAttribute('d','M10 1.6L12.5 7l5.9.7-4.3 4.1 1.1 5.8L10 14.7 4.8 17.6l1.1-5.8L1.6 7.7 7.5 7Z');s.append(path);dot.append(s);}
+ b.append(dot);
  if(label){const span=emphasize(e('span','pin-label'),p,mapName(p));if(typeof label==='object'){span.style.left=label.dx+'px';span.style.top=label.dy+'px';if(label.dx>60){const line=e('i','label-leader');const half=matchMedia('(pointer:coarse)').matches?20:15,dx=label.dx-half-4,dy=label.dy+10-half;line.style.left=half+'px';line.style.top=half+'px';line.style.width=Math.hypot(dx,dy)+'px';line.style.transform='rotate('+Math.atan2(dy,dx)+'rad)';b.append(line);}}b.append(span);}
  b.addEventListener('click',ev=>{ev.stopPropagation();openPlace(p.id,false);});return b;
 }
@@ -328,16 +333,17 @@ function grouping(){
  const points=currentPoints().map(p=>({...p,xy:engine.point(p)})).filter(p=>p.xy.x>-60&&p.xy.x<w+60&&p.xy.y>-60&&p.xy.y<h+60);
  const named=points.filter(p=>p.kind==='country'||p.kind==='sea');
  const peaks=layer==='relief'?points.filter(p=>heights[p.id]):[];
- const singles=points.filter(p=>p.kind!=='country'&&p.kind!=='sea'&&(p.capital||layer!=='relief'||heights[p.id]||p.id===selected||!peaks.some(q=>Math.hypot(p.xy.x-q.xy.x,p.xy.y-q.xy.y)<radius))).sort((a,b)=>((b.capital?1:0)-(a.capital?1:0))||((heights[b.id]?1:0)-(heights[a.id]?1:0))||(Number(Boolean(b.emphasis))-Number(Boolean(a.emphasis)))||(ranks.get(a.id)??200)-(ranks.get(b.id)??200));
+ const caps=points.filter(p=>p.capital);
+ const singles=points.filter(p=>p.kind!=='country'&&p.kind!=='sea'&&(p.capital||layer!=='relief'||heights[p.id]||p.id===selected||(!peaks.some(q=>Math.hypot(p.xy.x-q.xy.x,p.xy.y-q.xy.y)<radius)&&!caps.some(q=>Math.hypot(p.xy.x-q.xy.x,p.xy.y-q.xy.y)<20)))).sort((a,b)=>((b.capital?1:0)-(a.capital?1:0))||((heights[b.id]?1:0)-(heights[a.id]?1:0))||(Number(Boolean(b.emphasis))-Number(Boolean(a.emphasis)))||(ranks.get(a.id)??200)-(ranks.get(b.id)??200));
  const groups=[];
  function recenter(g){g.x=g.members.reduce((s,p)=>s+p.xy.x,0)/g.members.length;g.y=g.members.reduce((s,p)=>s+p.xy.y,0)/g.members.length;}
  const fixed=g=>g.members.some(p=>p.capital||(layer==='relief'&&heights[p.id]));
  for(const p of singles){const near=groups.find(g=>!p.capital&&!(layer==='relief'&&heights[p.id])&&!fixed(g)&&Math.hypot(p.xy.x-g.x,p.xy.y-g.y)<radius);if(near){near.members.push(p);recenter(near);}else groups.push({x:p.xy.x,y:p.xy.y,members:[p]});}
  let merged=true;while(merged){merged=false;for(let i=0;i<groups.length&&!merged;i++)for(let j=i+1;j<groups.length;j++)if(!fixed(groups[i])&&!fixed(groups[j])&&Math.hypot(groups[i].x-groups[j].x,groups[i].y-groups[j].y)<radius){groups[i].members.push(...groups[j].members);recenter(groups[i]);groups.splice(j,1);merged=true;break;}}
- const half=coarse?21:17,boxes=groups.map(g=>({x:g.x-half,y:g.y-half,w:half*2,h:half*2}));
+ const boxes=groups.map(g=>{const r=g.members.length>1?11:4;return{x:g.x-r,y:g.y-r,w:r*2,h:r*2};});
  boxes.push({x:0,y:0,w:w<700?185:290,h:w<700?110:160},{x:w<700?12:30,y:w<700?118:165,w:300,h:48},{x:w-85,y:h*.4,w:85,h:155},{x:0,y:h-95,w:Math.min(w,480),h:95});
  const result=[];
- function placeLabel(x,y,name,main=false,bold=false){const width=name.length*(main?(bold?7.7:7.2):(bold?6.6:6.1)),height=20;const options=main?[[x-width/2,y-10],[x-width/2,y-36],[x-width/2,y+22],[x-width-22,y-10],[x+23,y-10],[x-width/2,y-68],[x-width/2,y+55],[x-width-50,y-10],[x+50,y-10]]:[[x+23,y-10],[x-width-23,y-10],[x-width/2,y-38],[x-width/2,y+22],[x+23,y-40],[x-width-23,y-40],[x+23,y+24],[x-width-23,y+24],[x+62,y-10],[x+62,y-42],[x+62,y+24]];
+ function placeLabel(x,y,name,main=false,bold=false){const width=name.length*(main?(bold?7.7:7.2):(bold?6.6:6.1)),height=20;const options=main?[[x-width/2,y-10],[x-width/2,y-36],[x-width/2,y+22],[x-width-22,y-10],[x+23,y-10],[x-width/2,y-68],[x-width/2,y+55],[x-width-50,y-10],[x+50,y-10]]:[[x+12,y-12],[x-width-12,y-12],[x+23,y-10],[x-width-23,y-10],[x-width/2,y-34],[x-width/2,y+18],[x+18,y-34],[x-width-18,y-34],[x+18,y+20],[x-width-18,y+20],[x+56,y-10]];
  for(const [lx,ly]of options){const box={x:lx,y:ly,w:width,h:height};if(lx>5&&lx+width<w-8&&ly>5&&ly+height<h-22&&!boxes.some(b=>overlap(b,box))){boxes.push(box);return box;}}return null;}
  function emitGroup(g){const p=g.members[0],size=coarse?40:(g.members.length>1?32:30);const eligible=Boolean(p.capital)||Boolean(p.emphasis)||layer!=='places'||zoom>=7.3||ranks.has(p.id)||p.id===selected;const box=eligible?placeLabel(g.x,g.y,p.name,false,Boolean(p.emphasis)||Boolean(p.capital)):null;const label=box?{name:p.name,dx:box.x-g.x+size/2,dy:box.y-g.y+size/2}:(p.capital?{name:p.name,dx:size/2+14,dy:size/2-10}:false);
   if(g.members.length>1)result.push({...g,label});else result.push({...g,point:p,label});
@@ -555,7 +561,7 @@ function renderSearch(){
    const item=e('button','search-item'+(idx===searchActive?' active':''));item.type='button';item.setAttribute('role','option');item.setAttribute('aria-selected',String(idx===searchActive));item.dataset.searchPlace=hit.p.id;
    const head=e('div','search-item-head');
    const dot=e('i','key '+(hit.p.capital?'capital-star':hit.p.kind==='mountain'?'mountain':hit.p.kind==='lake'||hit.p.kind==='river'?'lake':hit.p.kind==='island'?'island':hit.p.kind==='nature'?'nature':'landmark'));
-   if(!hit.p.capital)dot.style.background=colors[hit.p.kind];
+   dot.style.background=colors[hit.p.kind];
    const title=emphasize(e('span','search-item-title'),hit.p,hit.p.name);
    const right=e('span','search-item-meta',kinds[hit.p.kind].split(' / ')[0]+' · s. '+hit.p.pages);
    head.append(dot,title,right);
