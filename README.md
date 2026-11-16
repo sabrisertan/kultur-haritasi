@@ -2,12 +2,13 @@
 
 Britain Today, Chapter I (basılı s. 5–24) için interaktif çalışma haritası.
 
-Yerler, şematik yükselti, flora ve fauna katmanları. Açıklamalar Türkçe;
-öğrenilecek adlar İngilizce. Kitap dışı açıklamalar ★ ile ayrılır.
+Yerler, şematik yükselti, iklim (Gulf Stream ve güneybatı rüzgâr okları), flora ve fauna
+katmanları; ayrıca Bölüm I (s. 6–24) sırasını izleyen 136 adımlı Kitap Turu ve anında
+arama içerir. Açıklamalar Türkçe; öğrenilecek adlar İngilizce. Kitap dışı açıklamalar ★ ile ayrılır.
 
-Yerler katmanında 110 konu korunur; önemli yerler genel görünümde,
-diğer adlar yakınlaştırdıkça açılır. Kitaptaki kalın adlar sarı vurgulu,
-diğer adlar ince görünür. 23 nehir grubu çizgiden, sekiz göl alanından seçilir.
+Haritada 110 yer/konu ve İklim katmanında 2 etkileşimli akıntı/rüzgâr vektörü korunur;
+önemli yerler genel görünümde, diğer adlar yakınlaştırdıkça açılır. Kitaptaki kalın adlar
+sarı vurgulu, diğer adlar ince görünür. 23 nehir grubu çizgiden, sekiz göl alanından seçilir.
 
 `index.html` tek başına çalışır. `water.geojson` indirilebilir kaynaklı
 harita verisidir. GitHub Pages kaynağı: `main` / `root`.
